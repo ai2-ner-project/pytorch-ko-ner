@@ -9,10 +9,7 @@ from datasets import load_metric
 import torch
 
 # kobert tokenizer/ model
-from kobert_transformers.tokenization_kobert import KoBertTokenizer
 from kobert_tokenizer import KoBERTTokenizer
-from transformers import BertModel
-
 
 # huggingface tokenizer/model
 from transformers import AutoTokenizer
@@ -64,10 +61,8 @@ def get_pretrained_model(model_name: str, num_labels: int, with_tokenizer=False)
     Some kobert models require a certain tokenizer and model loader.
     Otherwise, use AutoModelForTokenClassification.
     """
-    if model_name == 'monologg/kobert':
-        model_loader = BertModel
-        tokenizer_loader = KoBertTokenizer
-    elif model_name == 'skt/kobert-base-v1':
+    
+    if model_name == 'skt/kobert-base-v1':
         model_loader = AutoModelForTokenClassification
         tokenizer_loader = KoBERTTokenizer
     elif model_name == 'monologg/koelectra-base-v3-discriminator':
