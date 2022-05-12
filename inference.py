@@ -8,8 +8,8 @@ import torch.nn as nn
 import torch.nn.functional as F 
 from torch.utils.data import DataLoader
 
-# kobert tokenizer/ model
-from kobert_transformers.tokenization_kobert import KoBertTokenizer
+# skt kobert tokenizer/ model
+from kobert_tokenizer import KoBERTTokenizer 
 from transformers import BertModel
 
 # Huggingface AutomModel/Tokenizer
