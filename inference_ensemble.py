@@ -35,6 +35,7 @@ def define_argparser():
     p = argparse.ArgumentParser()
     p.add_argument('--model_folder', required=True)
     p.add_argument('--test_file', required=True)
+    p.add_argument('--use_AutoTokenizer', type=bool, default=True)
     p.add_argument('--gpu_id', type=int, default=-1) 
     p.add_argument('--batch_size', type=int, default=16)
 
@@ -103,7 +104,8 @@ def main(config):
     index_to_label = saved_data_list[0]['classes']
     bert_best_list = [saved_data['bert'] for saved_data in saved_data_list]
 
-    tokenizer = AutoTokenizer.from_pretrained(train_config.pretrained_model_name)
+    tokenizer_loader = AutoTokenizer if config.use_AutoTokenizer else KoBERTTokenizer
+    tokenizer = tokenizer_loader.from_pretrained(train_config.pretrained_model_name)
     model = AutoModelForTokenClassification.from_pretrained(
                                                                 train_config.pretrained_model_name,
                                                                 num_labels=len(index_to_label))
