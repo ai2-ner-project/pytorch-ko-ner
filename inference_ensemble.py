@@ -11,8 +11,7 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader
 
 # kobert tokenizer/ model
-# from kobert_transformers.tokenization_kobert import KoBertTokenizer
-from transformers import BertModel
+from kobert_tokenizer import KoBERTTokenizer
 
 # Huggingface AutomModel/Tokenizer
 from transformers import AutoModelForTokenClassification
