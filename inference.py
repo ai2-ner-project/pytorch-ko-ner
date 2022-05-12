@@ -32,6 +32,7 @@ def define_argparser():
 
     p.add_argument('--model_fn', required=True)
     p.add_argument('--test_file', required=True)
+    p.add_argument('--use_AutoTokenizer', type=bool, default=True)
     p.add_argument('--gpu_id', type=int, default=-1)
     p.add_argument('--batch_size', type=int, default=16)
 
@@ -71,6 +72,7 @@ def main(config):
 
     with torch.no_grad():
         # Declare model and load pre-trained weights.
+        tokenizer_loader = AutoTokenizer if config.use_AutoTokenizer else 
         tokenizer = AutoTokenizer.from_pretrained(train_config.pretrained_model_name)
         model = AutoModelForTokenClassification.from_pretrained(train_config.pretrained_model_name,
                                                                 num_labels=len(index_to_label)
