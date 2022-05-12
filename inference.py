@@ -72,7 +72,7 @@ def main(config):
 
     with torch.no_grad():
         # Declare model and load pre-trained weights.
-        tokenizer_loader = AutoTokenizer if config.use_AutoTokenizer else 
+        tokenizer_loader = AutoTokenizer if config.use_AutoTokenizer else KoBERTTokenizer
         tokenizer = AutoTokenizer.from_pretrained(train_config.pretrained_model_name)
         model = AutoModelForTokenClassification.from_pretrained(train_config.pretrained_model_name,
                                                                 num_labels=len(index_to_label)
