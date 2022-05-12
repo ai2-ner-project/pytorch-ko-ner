@@ -50,3 +50,4 @@ scikit-learn==1.0.2
 pytorch-ignite==0.4.8
 datasets==2.1.0
 seqeval==1.2.2
+sentencepiece=0.1.96
