@@ -19,7 +19,7 @@ pip install -r requirements.txt
 pip install 'git+https://github.com/SKTBrain/KoBERT.git#egg=kobert_tokenizer&subdirectory=kobert_hf' 
 ```
 
-## PLM Comparison
+## PLM Comparision
 5가지 모델 비교
 
 ## Usage
