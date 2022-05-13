@@ -34,10 +34,10 @@ pip install 'git+https://github.com/SKTBrain/KoBERT.git#egg=kobert_tokenizer&sub
 @simso - 기본 2 epochs * 5 folds로 진행, 폴드별 total iterations 15152번으로 맞춤 등등
 
 ### Inference
-트레이닝 데이터와 동일하게 전처리한 테스트 데이터셋에 대해 모델의 폴더별 5개 체크포인트 결과의 평균을 최종값으로 하는 앙상블 기법을 적용했습니다. 
+트레이닝 데이터와 동일하게 전처리한 테스트 데이터셋에 대해 모델의 폴더별 5개 체크포인트 결과의 평균을 최종값으로 하는 앙상블 기법을 적용
 
 ```bash
-python inference_ensemble.py --model_folder ./model --test_file ./test_klue_roberta-base.encoded.pickle
+python inference_ensemble.py --model_folder ./model -- test_file ./test_klue_roberta-base.encoded.pickle
 ```
 
 ## Evaluation
