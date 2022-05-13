@@ -39,7 +39,10 @@ pip install 'git+https://github.com/SKTBrain/KoBERT.git#egg=kobert_tokenizer&sub
 평가지표 엔티티 F1, 테스트 데이터셋 결과
 
 ## Reference
-참고논문 및 깃허브 
+
+- Devlin et al., BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding, ACL, 2019
+- Kihyun Kim, Simple Neural Text Classification (NTC), GitHub
+- 황석현 외, BERT를 활용한 한국어 개체명 인식기, 한국정보처리학회, 2019
 
 ## NER Demo
 데모 url
