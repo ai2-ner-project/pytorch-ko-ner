@@ -1,10 +1,10 @@
 # NER - introduction
 프로젝트 소개
 
-### Data
+## Data
 모두의 말뭉치 중 36만개
 
-## Pre-requisite
+## Pre-Requisite
 
 ## PLM Comparison
 5가지 모델 비교
