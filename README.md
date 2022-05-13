@@ -19,10 +19,12 @@
 @simso
 
 ### Results
-결과 표
+트레인 결과
 
 ### Inference
+인퍼런스 결과
 
 ## Reference
+
 
 ## NER Demo
