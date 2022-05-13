@@ -12,7 +12,7 @@
 
 - python 3.8
 - 모듈 상세정보는 requirement.txt 파일 참고 
-- skt/kobert-base-v1의 경우 tokenizer 추가 설치 필요 
+- skt/kobert-base-v1의 경우 kobert tokenizer 추가 설치 필요 
 
 ```bash
 pip install -r requirements.txt
