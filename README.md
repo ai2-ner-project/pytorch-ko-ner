@@ -43,7 +43,7 @@ python inference_ensemble.py --model_folder ./model -- test_file ./test_klue_rob
 ## Evaluation
 Entity-level micro F1 (Entity F1) 
 
-|PLMs|F1|Accuracy|
+|PLMs|F1 Score|Accuracy|
 |-|-|-|
 |klue/bert-base|0.831|0.965|
 |skt/kobert-base-v1|0.771|0.954|
