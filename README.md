@@ -39,7 +39,7 @@ python inference_ensemble.py --model_folder ./model -- test_file ./test_klue_rob
 
 ## Evaluation
 - Entity-level micro F1 (Entity F1) 
-- 테스트 데이터 평과 결과 klue/roberta-base가 근소한 성능으로 우수
+- 테스트 데이터의 인퍼런스 결과 klue/roberta-base가 근소한 성능으로 우수
 
 |PLMs|F1 Score|Accuracy|
 |-|-|-|
