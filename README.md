@@ -25,7 +25,7 @@ pip install 'git+https://github.com/SKTBrain/KoBERT.git#egg=kobert_tokenizer&sub
 ## Usage
 
 ### Preparation
-@simso - 어떤 전처리(json, tokenization, pickle 등)를 해서 어떤 형태의 데이터 입력했다.
+@simso - 어떤 전처리(json, tokenization, pickle 등)를 해서 어떤 형태의 데이터 입력
 
 ### Pretraining Details
 @simso - bs, iter, ..
