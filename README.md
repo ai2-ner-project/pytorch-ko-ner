@@ -11,7 +11,7 @@
 ## Pre-Requisite
 
 - python 3.8
-- 상세 실험환경 세팅은 requirement.txt 파일 참고 
+- 모듈 상세정보는 requirement.txt 파일 참고 
 - skt/kobert-base-v1의 경우 tokenizer 추가 설치 필요 
 
 ## PLM Comparison
