@@ -41,9 +41,15 @@ python inference_ensemble.py --model_folder ./model -- test_file ./test_klue_rob
 ```
 
 ## Evaluation
-Entity-level macro F1 (Entity F1) 
+Entity-level micro F1 (Entity F1) 
 
-
+|PLMs|F1|Accuracy|
+|-|-|-|
+|klue/bert-base|0.831|0.965|
+|skt/kobert-base-v1|0.771|0.954|
+|klue/roberta-base|0.837|0.966|
+|monologg/koelectra-base-v3-discriminator|0.830|0.965|
+|monologg/kobigbird-bert-base|0.809|0.961|
 
 ## Reference
 
