@@ -23,7 +23,7 @@
 ### Inference
 인퍼런스는 어떻게 했고 어떤 형태의 결과물이 나오는 지
 
-### Evalutaion
+## Evalutaion
 평가지표, 그래서 모델별 결과 간단히 소개
 
 ## Reference
