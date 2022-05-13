@@ -6,6 +6,8 @@
 
 ## Pre-requisite
 
+## PLM Comparison
+5가지 모델 비교
 
 ## Usage
 
@@ -16,15 +18,16 @@
 @simso - bs, iter, ..
 
 ### Train
-@simso
-
-### Results
-트레인 결과
+@simso 
 
 ### Inference
-인퍼런스 결과
+인퍼런스는 어떻게 했고 어떤 형태의 결과물이 나오는 지
+
+### Evalutaion
+평가지표, 그래서 모델별 결과 간단히 소개
 
 ## Reference
-
+참고논문 및 깃허브 
 
 ## NER Demo
+데모 url
