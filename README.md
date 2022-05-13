@@ -12,7 +12,7 @@
 ## Usage
 
 ### Preparation
-@simso - 어떻게 전처리해서 어떤 형태의 데이터를 집어 넣었는지
+@simso - 어떻게 전처리(json, tokenization, pickle 등)해서 어떤 형태의 데이터를 집어 넣었는지
 
 ### Pretraining Details
 @simso - bs, iter, ..
