@@ -36,11 +36,6 @@ pip install 'git+https://github.com/SKTBrain/KoBERT.git#egg=kobert_tokenizer&sub
 ```bash
 python inference_ensemble.py --model_folder ./model -- test_file ./test_klue_roberta-base.encoded.pickle
 ```
-skt/kobert-base-v1의 경우 --use_AutoTokenizer를 False로 입력해 tokenizer_loader를 KoBERTTokenizer로 바꾸어야 합니다. 
-
-```bash
-python inference_ensemble.py --model_folder ./model -- test_file ./test_klue_roberta-base.encoded.pickle --use_AutoTokenizer False
-```
 
 ## Evaluation
 - Entity-level micro F1 (Entity F1) 
