@@ -31,10 +31,9 @@ pip install 'git+https://github.com/SKTBrain/KoBERT.git#egg=kobert_tokenizer&sub
 @simso - bs, iter, ..
 
 ### Train
-@simso - 트레이닝 데이터셋 (트레인+밸리드), 어떻게 트레인했는지
+@simso 
 
 ### Inference
-테스트 데이터셋, 어떻게 인퍼런스했고 어떤 형태의 결과물이 나오는 지
 
 ## Evaluation
 평가지표 엔티티 F1, 테스트 데이터셋 결과
