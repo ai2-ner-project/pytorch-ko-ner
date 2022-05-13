@@ -19,7 +19,7 @@ pip install 'git+https://github.com/SKTBrain/KoBERT.git#egg=kobert_tokenizer&sub
 ## PLM Comparision
 5가지 모델 비교
 
-## Usage
+## How to Use
 
 ### Preparation
 @simso - 어떤 전처리(json, tokenization, pickle 등)를 해서 어떤 형태의 데이터 입력
