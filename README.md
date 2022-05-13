@@ -14,6 +14,11 @@
 - 모듈 상세정보는 requirement.txt 파일 참고 
 - skt/kobert-base-v1의 경우 tokenizer 추가 설치 필요 
 
+```bash
+pip install -r requirements.txt
+pip install 'git+https://github.com/SKTBrain/KoBERT.git#egg=kobert_tokenizer&subdirectory=kobert_hf' 
+```
+
 ## PLM Comparison
 5가지 모델 비교
 
