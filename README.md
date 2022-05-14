@@ -7,8 +7,8 @@
 - 80만 문장 가운데 개체명 태깅 정보가 없는 경우를 제외하고 약 35만 문장으로 태스크 진행
 
 ## Pre-Requisite
-- python 3.8
-- 라이브러리 상세정보는 requirements.txt 파일 참고 
+- python 3.8 기준으로 테스트
+- 상세 라이브러리 정보는 requirements.txt 파일 참고 
 - skt/kobert-base-v1의 경우 kobert tokenizer 추가 설치 필요 
 
 ```bash
