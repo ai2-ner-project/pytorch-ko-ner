@@ -1,5 +1,5 @@
 # PLM을 활용한 한국어 개체명 인식
-주요 PLM의 fine-tuning을 통해 한국어 개체명 인식 다운스트림 태스크를 진행했습니다. HuggingFace 라이브러리를 활용해 국립국어원 개체명 분석 말뭉치 데이터셋에서 개체명으로 정의된 15개 개체명 유형 (인명, 지명, 문명, 인공물 등)에 대해 PLM 기반 개체명 인식기를 구현했습니다. 
+주요 한국어 PLM의 fine-tuning을 통해 한국어 개체명 인식 다운스트림 태스크를 진행했습니다. HuggingFace 라이브러리를 활용해 국립국어원 개체명 분석 말뭉치 데이터셋에서 개체명으로 정의된 15개 개체명 유형 (인명, 지명, 문명, 인공물 등)에 대해 PLM 기반 개체명 인식기를 구현했습니다. 
 
 ## Data
 - 국립국어원  개체명  분석  말뭉치 2021 (https://corpus.korean.go.kr/main.do)
@@ -8,7 +8,7 @@
 
 ## Pre-Requisite
 - python 3.8 기준으로 테스트
-- 상세 라이브러리 정보는 requirements.txt 파일 참고 
+- 설치 모듈 상세정보는 requirements.txt 파일 참고 
 - skt/kobert-base-v1의 경우 kobert tokenizer 추가 설치 필요 
 
 ```bash
@@ -17,7 +17,13 @@ pip install 'git+https://github.com/SKTBrain/KoBERT.git#egg=kobert_tokenizer&sub
 ```
 
 ## PLM Comparision
-5가지 모델 비교
+|Model|Dataset|Tokenization|Vocabulary|Hidden|Layers|Heads|Batch|
+|-|-|-|-|-|-|-|-|
+|klue/bert-base|6.5B words including Modu, Namuwiki, Blue House National Petional, etc|Mecab +BPE|32,000|768|12|12|256|
+|klue/roberta-base|6.5B words including Modu, Namuwiki, Blue House National Petional, etc|Mecab +BPE|32,000|768|12|12|2048|
+|skt/kobert-base-v1|Korean Wiki 54M words|SentencePiece|8,002|3072|12|12|-|
+|monologg/koelectra-base-v3-discriminator|crawled news data and MODU|Wordpiece|35,000|768|12|12|256|
+|monologg/kobigbird-bert-base|crawled news data and MODU|Sentencepiece|32,500|768|12|12|32|
 
 ## How to Use
 
@@ -44,8 +50,8 @@ python inference_ensemble.py --model_folder ./model -- test_file ./test_klue_rob
 |PLMs|F1 Score|Accuracy|
 |-|-|-|
 |klue/bert-base|0.831|0.965|
-|skt/kobert-base-v1|0.771|0.954|
 |klue/roberta-base|0.837|0.966|
+|skt/kobert-base-v1|0.771|0.954|
 |monologg/koelectra-base-v3-discriminator|0.830|0.965|
 |monologg/kobigbird-bert-base|0.809|0.961|
 
