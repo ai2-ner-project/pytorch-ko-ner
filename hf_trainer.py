@@ -8,15 +8,8 @@ from sklearn.model_selection import StratifiedKFold, train_test_split
 from datasets import load_metric
 import torch
 
-# kobert tokenizer/ model
-from kobert_tokenizer import KoBERTTokenizer
-
 # huggingface tokenizer/model
-from transformers import AutoTokenizer
 from transformers import AutoModelForTokenClassification
-from transformers import ElectraTokenizer
-from transformers import ElectraForTokenClassification
-
 
 # huggingface trainer
 from transformers import Trainer
@@ -30,17 +23,17 @@ from ner.ner_dataset import NERDatasetPreEncoded
 def define_argparser():
     p = argparse.ArgumentParser()
 
-    p.add_argument('--model_fn',
+    p.add_argument('--model_dir',
                    required=True,
-                   help="File name to save trained model.")
-    p.add_argument('--file_fn',
+                   help="Directory to save trained model.")
+    p.add_argument('--data_fn',
                    required=True,
                    help="Data file name for training model.")
 
     p.add_argument('--pretrained_model_name',
                    required=True,
                    default='klue/bert-base',
-                   help="Set pretrained model. (Examples: klue/bert-base, monologg/kobert, ...")
+                   help="Pretrained model name from HuggingFace.")
 
     p.add_argument('--valid_ratio', type=float, default=.2)
     p.add_argument('--batch_size_per_device', type=int, default=32)
@@ -56,26 +49,13 @@ def define_argparser():
     return config
 
 
-def get_pretrained_model(model_name: str, num_labels: int, with_tokenizer=False):
+def get_pretrained_model(model_name: str, num_labels: int):
     """
-    Some kobert models require a certain tokenizer and model loader.
-    Otherwise, use AutoModelForTokenClassification.
+    Basically, use AutoModelForTokenClassification from Huffingface.
+    This function remains for future issue.
     """
-    
-    if model_name == 'skt/kobert-base-v1':
-        model_loader = AutoModelForTokenClassification
-        tokenizer_loader = KoBERTTokenizer
-    elif model_name == 'monologg/koelectra-base-v3-discriminator':
-        model_loader = ElectraForTokenClassification
-        tokenizer_loader = ElectraTokenizer
-    else:
-        model_loader = AutoModelForTokenClassification
-        tokenizer_loader = AutoTokenizer
-    
-    if with_tokenizer:
-        return model_loader.from_pretrained(model_name, num_labels=num_labels), tokenizer_loader.from_pretrained(model_name)
-    else:
-        return model_loader.from_pretrained(model_name, num_labels=num_labels)
+    model_loader = AutoModelForTokenClassification
+    return model_loader.from_pretrained(model_name, num_labels=num_labels)
 
 
 def load_data(fn, use_kfold=False, n_splits=5, shuffle=True):
@@ -120,7 +100,8 @@ def split_dataset(data, use_kfold=False, n_fold=None, valid_ratio=.2, shuffle=Fa
 
 def compute_metrics(pred):
     """
-    add citation.
+    Compute metrics use "seqeval"
+    It evaluates based on Entity Level F1 score.
     """
     metric = load_metric('seqeval')
 
@@ -148,7 +129,7 @@ def compute_metrics(pred):
 
 
 def train_one_fold(data, n_fold, data_args, config):
-    pretrained_model_name = '_'.join(config.pretrained_model_name.split('/'))
+    pretrained_model_name = config.pretrained_model_name.replace('/', '_')
 
     label_to_index = data_args['label_info']['label_to_index']
     index_to_label = data_args['label_info']['index_to_label']
@@ -206,7 +187,7 @@ def train_one_fold(data, n_fold, data_args, config):
                         f"{config.max_length}_length",
                         f"{n_fold}_fold", 
                         "pth"])
-    model_fn = os.path.join(os.path.split(config.model_fn)[0], fn_prefix)
+    model_fn = os.path.join(config.model_dir, fn_prefix)
 
     torch.save({
         'rnn': None,
@@ -219,7 +200,7 @@ def train_one_fold(data, n_fold, data_args, config):
 
 
 def main(config):
-    data, data_args = load_data(config.file_fn, use_kfold=config.use_kfold,
+    data, data_args = load_data(config.data_fn, use_kfold=config.use_kfold,
                      n_splits=config.n_splits, shuffle=True)
 
     for i in range(config.n_splits):
@@ -228,8 +209,5 @@ def main(config):
 
 
 if __name__ == '__main__':
-    os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
-    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-
     config = define_argparser()
     main(config)
