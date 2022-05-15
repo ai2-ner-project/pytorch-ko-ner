@@ -23,7 +23,7 @@ from ner.ner_dataset import NERDatasetPreEncoded
 def define_argparser():
     p = argparse.ArgumentParser()
 
-    p.add_argument('--model_dir',
+    p.add_argument('--model_folder',
                    required=True,
                    help="Directory to save trained model.")
     p.add_argument('--data_fn',
@@ -187,7 +187,7 @@ def train_one_fold(data, n_fold, data_args, config):
                         f"{config.max_length}_length",
                         f"{n_fold}_fold", 
                         "pth"])
-    model_fn = os.path.join(config.model_dir, fn_prefix)
+    model_fn = os.path.join(config.model_folder, fn_prefix)
 
     torch.save({
         'rnn': None,
