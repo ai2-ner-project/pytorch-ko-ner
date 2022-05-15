@@ -90,7 +90,7 @@ python hf_trainer.py --model_fn models --data_fn data/encoded/train.klue_roberta
 
 
 ### Inference
-트레이닝과 동일하게 전처리한 테스트 데이터셋(66845개)에 대해 모델의 폴더별 5개 체크포인트 결과의 평균을 최종값으로 하는 앙상블 기법을 적용합니다. --model_folder는 각 모델의 5개 체크포인트 결과가 들어있는 폴더이고, --test_file은 테스트 파일 이름입니다. 
+트레이닝과 동일하게 전처리한 테스트 데이터셋(66845개)에 대해 모델별, 폴더별 5개 체크포인트 결과의 평균을 최종값으로 하는 앙상블 기법을 적용합니다. --model_folder는 각 모델의 5개 체크포인트 결과가 들어있는 폴더이고, --test_file은 테스트 파일 이름입니다. 
 
 ```bash
 python inference_ensemble.py --model_folder ./model -- test_file ./test_klue_roberta-base.encoded.pickle
