@@ -20,7 +20,7 @@ pip install 'git+https://github.com/SKTBrain/KoBERT.git#egg=kobert_tokenizer&sub
 |Model|PretrainingCorpus|Tokenization|Vocabulary|Hidden|Layers|Heads|Batch|
 |-|-|-|-|-|-|-|-|
 |klue/bert-base|6.5B words incl. Modu, Namuwiki|Mecab +BPE|32,000|768|12|12|256|
-|klue/roberta-base|6.5B words incl.Modu, Namuwiki|Mecab +BPE|32,000|768|12|12|2048|
+|klue/roberta-base|6.5B words incl. Modu, Namuwiki|Mecab +BPE|32,000|768|12|12|2048|
 |skt/kobert-base-v1|Korean Wiki 54M words  |SentencePiece|8,002|3072|12|12|-|
 |monologg/koelectra-base-v3-discriminator|crawled news data and Modu  |Wordpiece|35,000|768|12|12|256|
 |monologg/kobigbird-bert-base|crawled news data and Modu  |Sentencepiece|32,500|768|12|12|32|
