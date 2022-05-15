@@ -17,7 +17,7 @@ pip install 'git+https://github.com/SKTBrain/KoBERT.git#egg=kobert_tokenizer&sub
 ```
 
 ## PLM Comparision
-|Model|TrainingCorpus|Tokenization|Vocabulary|Hidden|Layers|Heads|Batch|
+|Model|PretrainingCorpus|Tokenization|Vocabulary|Hidden|Layers|Heads|Batch|
 |-|-|-|-|-|-|-|-|
 |klue/bert-base|6.5B words incl. Modu, Namuwiki|Mecab +BPE|32,000|768|12|12|256|
 |klue/roberta-base|6.5B words incl.Modu, Namuwiki  |Mecab +BPE|32,000|768|12|12|2048|
