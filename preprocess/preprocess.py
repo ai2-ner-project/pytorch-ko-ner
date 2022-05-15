@@ -10,24 +10,37 @@ def define_argparser():
     p.add_argument(
         '--load_path',
         required=True,
-        help="Directory to load data file."
+        help="Path to load data file."
     )
     p.add_argument(
         "--save_path",
         required=True,
-        help="Directory to save preprocessed dataset."
+        help="Path to save preprocessed dataset."
     )
     p.add_argument(
         '--test_size',
         required=True,
         default=.2,
         type=float,
-        help="Set test size. Input float number"
+        help="Ratio of test data over dataset. Float only acceptable."
     )
+
+    p.add_argument(
+        "--pass_drop_o",
+        action="store_true",
+        help="If true, train/test set contains O sentences without any NE."
+    )
+    p.add_argument(
+        "--test_o_size",
+        default=0,
+        type=float,
+        help="Ratio of sentences without any NE over test data. It only work when pass_drop_o is False."
+    )
+
     p.add_argument(
         '--save_all',
         action="store_true",
-        help="If true, save concatenated data as well as train and test data"
+        help="If true, save not splited data."
     )
     p.add_argument(
         "--return_tsv",
@@ -47,23 +60,25 @@ def main(config):
     2. Concatenate files and drop useless columns.
     3. Add labels for experiments and data split.
     """
-    filepath = config.load_path
-    savepath = config.save_path
+    load_path = config.load_path
+    save_path = config.save_path
 
     # Read data files.
-    if os.path.isdir(filepath):
-        file_list = os.listdir(filepath)
+    if os.path.isdir(load_path):
+        file_list = [fn for fn in os.listdir(load_path) if fn.endswith("pickle")]
     print(f"{len(file_list)} files found : ", file_list)
 
     for i, file in enumerate(file_list):
-        file_list[i] = pd.read_pickle(os.path.join(filepath, file))
+        load_file = os.path.join(load_path, file)
+        file_list[i] = pd.read_pickle(load_file)
         print(f"file {i} : ", file_list[i].shape[0])
 
     # Concatenate all data files in the directory.
     data = pd.concat(file_list, axis=0, ignore_index=True)
     print(f"|data before preprocessing| {data.shape[0]}")
 
-    # 
+    # Add source of sentence
+    # S: Conversation / N: News
     data['source'] = data['sentence_id'].str[0]
     data = data.drop(columns=['sentence_id'], axis=1)
     data = data[data['sentence'].map(len) > 0].reset_index(drop=True)
@@ -99,22 +114,46 @@ def main(config):
                     break
 
     data['sentence_class'] = sentence_class
-    data = data.drop(columns=["ne_label_list"])
-    print(f"|data after preprocessing| {data.shape[0]}")
+    print(f"|data after preprocessing| {data.shape[0]} / before dropping O sentences")
 
     train, test = train_test_split(data, test_size=config.test_size, stratify=data['sentence_class'])
-    print(f"|train| {train.shape[0]} / |test| {test.shape[0]}")
+    print(f"|train| {train.shape[0]} / |test| {test.shape[0]} / before dropping O sentences")
+
+    # Drop "O" sentences and add some sample for test
+    if config.pass_drop_o:
+        pass
+    else:
+        train = train[train['ne_label_list'].map(len) > 0]
+        test_o = test[test['ne_label_list'].map(len) == 0]
+        test = test[test['ne_label_list'].map(len) > 0]
+        if config.test_o_size > 0:
+            test_o['n_words'] = test_o['sentence'].map(lambda x: len(x.split()))
+            test_o_from_n = test_o[test_o['source'] == 'N']
+            test_o_from_s = test_o[test_o['source'] == 'S']
+
+            test_o_ratio = config.test_o_size / (1 - config.test_o_size)
+            num_o_sample = int(test.shape[0] * test_o_ratio)
+            num_o_from_n = min(num_o_sample // 2, test_o_from_n.shape[0])
+            num_o_from_s = num_o_sample - num_o_from_n
+            test_o_from_n = test_o_from_n.sample(n=num_o_from_n, random_state=42)
+            test_o_from_s = test_o_from_s.sample(n=num_o_from_s, weights='n_words', random_state=42)                
+            test = pd.concat([test, test_o_from_n, test_o_from_s])
+
+    data = data.drop(columns=["ne_label_list"])
+    train = train.drop(columns=["ne_label_list"])
+    test = test.drop(columns=["ne_label_list", "n_words"])
+    print(f"|train| {train.shape[0]} / |test| {test.shape[0]} / after dropping and sampling O sentences")
 
     if config.save_all:
-        data.to_pickle(os.path.join(savepath, 'data.pickle'))
-    train.to_pickle(os.path.join(savepath, 'train.pickle'))
-    test.to_pickle(os.path.join(savepath, 'test.pickle'))
+        data.to_pickle(os.path.join(save_path, 'data.pickle'))
+    train.to_pickle(os.path.join(save_path, 'train.pickle'))
+    test.to_pickle(os.path.join(save_path, 'test.pickle'))
     
     if config.return_tsv:
         if config.save_all:
-            data.to_csv(os.path.join(savepath, 'data.tsv'), sep='\t', index=False)
-        train.to_csv(os.path.join(savepath, 'train.tsv'), sep='\t', index=False)
-        test.to_csv(os.path.join(savepath, 'test.tsv'), sep='\t', index=False)
+            data.to_csv(os.path.join(save_path, 'data.tsv'), sep='\t', index=False)
+        train.to_csv(os.path.join(save_path, 'train.tsv'), sep='\t', index=False)
+        test.to_csv(os.path.join(save_path, 'test.tsv'), sep='\t', index=False)
 
 
 if __name__ == "__main__":

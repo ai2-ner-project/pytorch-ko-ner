@@ -11,14 +11,14 @@ def define_argparser():
     p = argparse.ArgumentParser()
 
     p.add_argument(
-        '--load_fn',
+        '--load_path',
         required=True,
-        help="Directory contains original data."
+        help="Path of file or directory to load original corpus."
     )
     p.add_argument(
-        '--save_fn',
+        '--save_path',
         required=True,
-        help="File name to save the dataframe without file format. File format will be added according to args."
+        help="Path to save data."
     )
     p.add_argument(
         '--return_tsv',
@@ -57,17 +57,20 @@ def json_to_tsv(file: str):
 
 
 def main(config):
-    filepath = config.load_fn
-    save_fn = config.save_fn
+    load_path = config.load_path
+    fn = os.path.split(config.load_path)[1]
+    if fn.rfind(".") > 0:
+        fn = fn[:fn.rfind(".")]
+    save_fn = os.path.join(config.save_path, fn)
 
-    if os.path.isdir(filepath):
+    if os.path.isdir(load_path):
         dfs = []
-        for file in tqdm(os.listdir(filepath)):
-            df = json_to_tsv(os.path.join(filepath, file))
+        for file in tqdm(os.listdir(load_path)):
+            df = json_to_tsv(os.path.join(load_path, file))
             dfs.append(df)
         data = pd.concat(dfs)
     else:
-        data = json_to_tsv(filepath)
+        data = json_to_tsv(load_path)
 
     with open(save_fn+'.pickle', "wb") as f:
         pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
