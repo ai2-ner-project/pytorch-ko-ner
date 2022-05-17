@@ -61,19 +61,19 @@ def get_pretrained_model(model_name: str, num_labels: int, with_tokenizer=False)
     Some kobert models require a certain tokenizer and model loader.
     Otherwise, use AutoModelForTokenClassification.
     """
-    
-    if model_name == 'skt/kobert-base-v1':
-        model_loader = AutoModelForTokenClassification
-        tokenizer_loader = KoBERTTokenizer
-    elif model_name == 'monologg/koelectra-base-v3-discriminator':
+
+    if model_name == 'monologg/koelectra-base-v3-discriminator':
         model_loader = ElectraForTokenClassification
         tokenizer_loader = ElectraTokenizer
     else:
         model_loader = AutoModelForTokenClassification
         tokenizer_loader = AutoTokenizer
-    
+
     if with_tokenizer:
-        return model_loader.from_pretrained(model_name, num_labels=num_labels), tokenizer_loader.from_pretrained(model_name)
+        if model_name == 'skt/kobert-base-v1':
+            return model_loader.from_pretrained(model_name, num_labels=num_labels), tokenizer_loader.from_pretrained(model_name, use_fast=True)
+        else:
+            return model_loader.from_pretrained(model_name, num_labels=num_labels), tokenizer_loader.from_pretrained(model_name)
     else:
         return model_loader.from_pretrained(model_name, num_labels=num_labels)
 
@@ -112,8 +112,10 @@ def split_dataset(data, use_kfold=False, n_fold=None, valid_ratio=.2, shuffle=Fa
         train, valid = train_test_split(
             data, test_size=valid_ratio, random_state=42, shuffle=shuffle, stratify=data['sentence_class'])
 
-    train_dataset = NERDatasetPreEncoded(train['input_ids'].values, train['attention_mask'].values, train['labels'].values)
-    valid_dataset = NERDatasetPreEncoded(valid['input_ids'].values, valid['attention_mask'].values, valid['labels'].values)
+    train_dataset = NERDatasetPreEncoded(
+        train['input_ids'].values, train['attention_mask'].values, train['labels'].values)
+    valid_dataset = NERDatasetPreEncoded(
+        valid['input_ids'].values, valid['attention_mask'].values, valid['labels'].values)
 
     return train_dataset, valid_dataset
 
@@ -136,7 +138,7 @@ def compute_metrics(pred):
     results = metric.compute(
         predictions=true_predictions, references=true_labels)
     print(results)
-    
+
     eval_results = {
         "precision": results["overall_precision"],
         "recall": results["overall_recall"],
@@ -201,11 +203,11 @@ def train_one_fold(data, n_fold, data_args, config):
 
     trainer.train()
 
-    fn_prefix = '.'.join([pretrained_model_name, 
-                        f"{config.n_epochs_per_fold}_epochs", 
-                        f"{config.max_length}_length",
-                        f"{n_fold}_fold", 
-                        "pth"])
+    fn_prefix = '.'.join([pretrained_model_name,
+                          f"{config.n_epochs_per_fold}_epochs",
+                          f"{config.max_length}_length",
+                          f"{n_fold}_fold",
+                          "pth"])
     model_fn = os.path.join(os.path.split(config.model_fn)[0], fn_prefix)
 
     torch.save({
@@ -220,7 +222,7 @@ def train_one_fold(data, n_fold, data_args, config):
 
 def main(config):
     data, data_args = load_data(config.file_fn, use_kfold=config.use_kfold,
-                     n_splits=config.n_splits, shuffle=True)
+                                n_splits=config.n_splits, shuffle=True)
 
     for i in range(config.n_splits):
         print(f'=== fold {i} of {config.n_splits} training ===')
