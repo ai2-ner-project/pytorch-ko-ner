@@ -49,7 +49,7 @@ def BIO_tagging(text_tokens, ne, offset_map):
                 if word == '[UNK]':
                     if offset_map[word_idx][0] == ne_dict_offset:
                         labeled_sequence[word_idx] = str(
-                            ne_dict['label'][:2]) + '_B'
+                            'B-'+ne_dict['label'][:2])
                         break
                 if label_length == 0:
                     break
@@ -61,13 +61,13 @@ def BIO_tagging(text_tokens, ne, offset_map):
                 if word in ne_dict['form']:
                     if isbegin:
                         labeled_sequence[word_idx] = str(
-                            ne_dict['label'][:2]) + '_B'
+                            'B-'+ne_dict['label'][:2])
                         isbegin = False
                         label_length = label_length - len(word)
                         continue
                     elif (label_length > 0) & (isbegin == False) & (('_B' in labeled_sequence[word_idx-1]) or ('_I' in labeled_sequence[word_idx-1])):
                         labeled_sequence[word_idx] = str(
-                            ne_dict['label'][:2]) + '_I'
+                            'I-'+ne_dict['label'][:2])
                         label_length = label_length - len(word)
                         continue
 
