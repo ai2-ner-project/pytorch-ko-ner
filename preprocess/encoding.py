@@ -65,7 +65,7 @@ def BIO_tagging(text_tokens, ne, offset_map):
                         isbegin = False
                         label_length = label_length - len(word)
                         continue
-                    elif (label_length > 0) & (isbegin == False) & (('_B' in labeled_sequence[word_idx-1]) or ('_I' in labeled_sequence[word_idx-1])):
+                    elif (label_length > 0) & (isbegin == False) & (('B-' in labeled_sequence[word_idx-1]) or ('I-' in labeled_sequence[word_idx-1])):
                         labeled_sequence[word_idx] = str(
                             'I-'+ne_dict['label'][:2])
                         label_length = label_length - len(word)
