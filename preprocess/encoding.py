@@ -136,7 +136,7 @@ def main(config):
     ne_ids = []
     # (batch_size, length)
 
-    if tokenizer.name_or_path != 'skt/kobert-base-v1':
+    if tokenizer.name_or_path == 'skt/kobert-base-v1':
         for text, ne in zip(texts, nes):
             text_tokens = [cls_token] + \
                 tokenizer.tokenize(text)[:max_length-2] + [sep_token]
