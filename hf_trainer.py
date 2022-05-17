@@ -62,7 +62,10 @@ def get_pretrained_model(model_name: str, num_labels: int, with_tokenizer=False)
     Otherwise, use AutoModelForTokenClassification.
     """
 
-    if model_name == 'monologg/koelectra-base-v3-discriminator':
+    if model_name == 'skt/kobert-base-v1':
+        model_loader = AutoModelForTokenClassification
+        tokenizer_loader = KoBERTTokenizer
+    elif model_name == 'monologg/koelectra-base-v3-discriminator':
         model_loader = ElectraForTokenClassification
         tokenizer_loader = ElectraTokenizer
     else:
@@ -70,10 +73,7 @@ def get_pretrained_model(model_name: str, num_labels: int, with_tokenizer=False)
         tokenizer_loader = AutoTokenizer
 
     if with_tokenizer:
-        if model_name == 'skt/kobert-base-v1':
-            return model_loader.from_pretrained(model_name, num_labels=num_labels), tokenizer_loader.from_pretrained(model_name, use_fast=True)
-        else:
-            return model_loader.from_pretrained(model_name, num_labels=num_labels), tokenizer_loader.from_pretrained(model_name)
+        return model_loader.from_pretrained(model_name, num_labels=num_labels), tokenizer_loader.from_pretrained(model_name)
     else:
         return model_loader.from_pretrained(model_name, num_labels=num_labels)
 
