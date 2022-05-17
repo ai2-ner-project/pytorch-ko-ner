@@ -37,7 +37,7 @@ def define_argparser():
 
 def BIO_tagging(text_tokens, ne, offset_map=None):
     labeled_sequence = [token if token in [
-        '[CLS]', '[SEP]', '[PAD]', '[UNK]'] else 'O' for token in text_tokens]
+        '[CLS]', '[SEP]', '[PAD]'] else 'O' for token in text_tokens]
     ne_no = len(ne.keys())
     if ne_no > 0:
         for idx in range(1, ne_no+1):
