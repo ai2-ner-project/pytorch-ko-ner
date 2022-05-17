@@ -122,7 +122,7 @@ def main(config):
                             return_attention_mask=True,
                             truncation=True,
                             max_length=max_length,
-                            return_offset_mapping=True)
+                            return_offsets_mapping=True)
     else:
         encoded = tokenizer(texts,
                             add_special_tokens=True,
