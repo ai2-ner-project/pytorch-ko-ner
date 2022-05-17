@@ -6,10 +6,7 @@ import pandas as pd
 
 # Import Tokenizer
 from transformers import AutoTokenizer
-from transformers import ElectraTokenizer
-from kobert_transformers.tokenization_kobert import KoBertTokenizer
 from kobert_tokenizer import KoBERTTokenizer
-
 
 def define_argparser():
     p = argparse.ArgumentParser()
@@ -20,7 +17,12 @@ def define_argparser():
         help="Pre-trained model name to be going to train. Tokenizer will be assigned based on the model."
     )
     p.add_argument(
-        "--data_fn",
+        "--load_fn",
+        required=True,
+        help="Original data to be going to preprocess."
+    )
+    p.add_argument(
+        "--save_path",
         required=True,
         help="Original data to be going to preprocess."
     )
@@ -88,19 +90,15 @@ def get_label_dict(labels):
 
 def main(config):
 
-    data = pd.read_pickle(config.data_fn)
+    data = pd.read_pickle(config.load_fn)
 
     texts = data['sentence'].values.tolist()
     nes = data['ne'].values.tolist()
 
     pretrained_model_name = config.pretrained_model_name
 
-    if pretrained_model_name == 'monologg/kobert':
-        tokenizer_loader = KoBertTokenizer
-    elif pretrained_model_name == 'skt/kobert-base-v1':
+    if pretrained_model_name == 'skt/kobert-base-v1':
         tokenizer_loader = KoBERTTokenizer
-    elif pretrained_model_name == 'monologg/koelectra-base-v3-discriminator':
-        tokenizer_loader = ElectraTokenizer
     else:
         tokenizer_loader = AutoTokenizer
 
@@ -172,15 +170,14 @@ def main(config):
         "pad_token": (tokenizer.pad_token, tokenizer.pad_token_id),
     }
 
-    dir, fn = os.path.split(config.data_fn)
-    fn = fn.split('.')[0]
-    plm_name = '_'.join(pretrained_model_name.split('/'))
-    encoded_fn = os.path.join(dir, f'{fn}.{plm_name}.encoded.pickle')
+    save_path = config.save_path   
+    fn = os.path.split(config.load_fn)[1].split('.')[0]
+    plm_name = pretrained_model_name.replace('/', '_')
+    save_fn = os.path.join(save_path, f'{fn}.{plm_name}.encoded.pickle')
 
-    with open(encoded_fn, "wb") as f:
+    with open(save_fn, "wb") as f:
         pickle.dump(return_values, f, pickle.HIGHEST_PROTOCOL)
-    print("Encoded data saved as %s " % encoded_fn)
-
+    print("Encoded data saved as %s " % save_fn)
 
 if __name__ == "__main__":
     config = define_argparser()
