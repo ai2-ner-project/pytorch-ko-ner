@@ -10,6 +10,7 @@ from transformers import ElectraTokenizer
 from kobert_transformers.tokenization_kobert import KoBertTokenizer
 from kobert_tokenizer import KoBERTTokenizer
 
+
 def define_argparser():
     p = argparse.ArgumentParser()
 
@@ -34,15 +35,22 @@ def define_argparser():
     return config
 
 
-def BIO_tagging(text_tokens, ne):
-    labeled_sequence = [token if token in ['[CLS]', '[SEP]', '[PAD]'] else 'O' for token in text_tokens]
+def BIO_tagging(text_tokens, ne, offset_map):
+    labeled_sequence = [token if token in [
+        '[CLS]', '[SEP]', '[PAD]', '[UNK]'] else 'O' for token in text_tokens]
     ne_no = len(ne.keys())
     if ne_no > 0:
         for idx in range(1, ne_no+1):
             ne_dict = ne[idx]
+            ne_dict_offset = ne_dict['begin']
             label_length = len(ne_dict['form'].replace(' ', ''))
             isbegin = True
             for word_idx, word in enumerate(text_tokens):
+                if word == '[UNK]':
+                    if offset_map[word_idx][0] == ne_dict_offset:
+                        labeled_sequence[word_idx] = str(
+                            ne_dict['label'][:2]) + '_B'
+                        break
                 if label_length == 0:
                     break
                 if ('##' in word) or ('▁' in word):
@@ -52,12 +60,14 @@ def BIO_tagging(text_tokens, ne):
                     word = word.replace('▁', '')
                 if word in ne_dict['form']:
                     if isbegin:
-                        labeled_sequence[word_idx] = str(ne_dict['label'][:2]) + '_B'
+                        labeled_sequence[word_idx] = str(
+                            ne_dict['label'][:2]) + '_B'
                         isbegin = False
                         label_length = label_length - len(word)
                         continue
                     elif (label_length > 0) & (isbegin == False) & (('_B' in labeled_sequence[word_idx-1]) or ('_I' in labeled_sequence[word_idx-1])):
-                        labeled_sequence[word_idx] = str(ne_dict['label'][:2]) + '_I'
+                        labeled_sequence[word_idx] = str(
+                            ne_dict['label'][:2]) + '_I'
                         label_length = label_length - len(word)
                         continue
 
@@ -70,8 +80,8 @@ def get_label_dict(labels):
         BIO_labels.append(label+'_B')
         BIO_labels.append(label+'_I')
 
-    label_to_index = {label:index for index, label in enumerate(BIO_labels)}
-    index_to_label = {index:label for index, label in enumerate(BIO_labels)}
+    label_to_index = {label: index for index, label in enumerate(BIO_labels)}
+    index_to_label = {index: label for index, label in enumerate(BIO_labels)}
 
     return label_to_index, index_to_label
 
@@ -91,12 +101,14 @@ def main(config):
         tokenizer_loader = KoBERTTokenizer
     elif pretrained_model_name == 'monologg/koelectra-base-v3-discriminator':
         tokenizer_loader = ElectraTokenizer
-    else: tokenizer_loader = AutoTokenizer   
+    else:
+        tokenizer_loader = AutoTokenizer
 
     tokenizer = tokenizer_loader.from_pretrained(pretrained_model_name)
     print("Tokenizer loaded :", tokenizer.name_or_path)
 
-    label_list = ["PS", "FD", "TR", "AF", "OG", "LC", "CV", "DT", "TI", "QT", "EV", "AM", "PT", "MT", "TM"]
+    label_list = ["PS", "FD", "TR", "AF", "OG", "LC", "CV",
+                  "DT", "TI", "QT", "EV", "AM", "PT", "MT", "TM"]
     label_to_index, index_to_label = get_label_dict(label_list)
 
     cls_token = tokenizer.cls_token
@@ -108,37 +120,40 @@ def main(config):
                         padding=False,
                         return_attention_mask=True,
                         truncation=True,
-                        max_length=max_length)
-    print("Sentences encoded : |input_ids| %d, |attention_mask| %d" % 
+                        max_length=max_length,
+                        return_offset_mapping=True)
+    print("Sentences encoded : |input_ids| %d, |attention_mask| %d" %
           (len(encoded['input_ids']), len((encoded['attention_mask']))))
 
     ne_ids = []
     # (batch_size, length)
-    for text, ne in zip(texts, nes) :
-        text_tokens = [cls_token] + tokenizer.tokenize(text)[:max_length-2] + [sep_token]
-        ne_sequence = BIO_tagging(text_tokens, ne)
-        ne_id = [label_to_index[key] if key in label_to_index.keys() else -100 for key in ne_sequence]
+    for text, ne, offset_mapping in zip(texts, nes, encoded['offset_mapping']):
+        text_tokens = [cls_token] + \
+            tokenizer.tokenize(text)[:max_length-2] + [sep_token]
+        ne_sequence = BIO_tagging(text_tokens, ne, offset_mapping)
+        ne_id = [label_to_index[key] if key in label_to_index.keys()
+                 else -100 for key in ne_sequence]
         ne_ids.append(ne_id)
 
     print("Sequence labeling completed : |labels| %d" % (len(ne_ids)))
 
-    return_data = pd.DataFrame([encoded["input_ids"], encoded["attention_mask"], ne_ids, data['sentence_class'].values], index=["input_ids", "attention_mask", "labels", "sentence_class"]).T
+    return_data = pd.DataFrame([encoded["input_ids"], encoded["attention_mask"], ne_ids, data['sentence_class'].values], index=[
+                               "input_ids", "attention_mask", "labels", "sentence_class"]).T
     if config.with_text:
         return_data['sentence'] = texts
 
-
     label_info = {
-        "label_list" : label_list,
-        "label_to_index" : label_to_index,
-        "index_to_label" : index_to_label
-    }    
+        "label_list": label_list,
+        "label_to_index": label_to_index,
+        "index_to_label": index_to_label
+    }
 
     return_values = {
-        "data" : return_data.to_dict(),
-        "label_info" : label_info,
-        "pad_token" : (tokenizer.pad_token, tokenizer.pad_token_id),
+        "data": return_data.to_dict(),
+        "label_info": label_info,
+        "pad_token": (tokenizer.pad_token, tokenizer.pad_token_id),
     }
-    
+
     dir, fn = os.path.split(config.data_fn)
     fn = fn.split('.')[0]
     plm_name = '_'.join(pretrained_model_name.split('/'))
