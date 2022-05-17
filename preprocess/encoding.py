@@ -77,8 +77,8 @@ def BIO_tagging(text_tokens, ne, offset_map=None):
 def get_label_dict(labels):
     BIO_labels = ['O']
     for label in labels:
-        BIO_labels.append(label+'_B')
-        BIO_labels.append(label+'_I')
+        BIO_labels.append('B-'+label)
+        BIO_labels.append('I-'+label)
 
     label_to_index = {label: index for index, label in enumerate(BIO_labels)}
     index_to_label = {index: label for index, label in enumerate(BIO_labels)}
