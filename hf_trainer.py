@@ -6,6 +6,7 @@ import pandas as pd
 
 from sklearn.model_selection import StratifiedKFold, train_test_split
 from datasets import load_metric
+from seqeval.metrics import classification_report
 import torch
 
 # huggingface tokenizer/model
@@ -98,34 +99,38 @@ def split_dataset(data, use_kfold=False, n_fold=None, valid_ratio=.2, shuffle=Fa
     return train_dataset, valid_dataset
 
 
-def compute_metrics(pred):
-    """
-    Compute metrics use "seqeval"
-    It evaluates based on Entity Level F1 score.
-    """
-    metric = load_metric('seqeval')
+class compute_metrics():
 
-    labels = pred.label_ids
-    predictions = pred.predictions.argmax(2)
+    def __init__(self, index_to_label):
+        self.index_to_label = index_to_label
 
-    # Discard special tokens based on true_labels.
-    true_predictions = [[p for p, l in zip(
-        prediction, label) if l >= 0] for prediction, label in zip(predictions, labels)]
-    true_labels = [[l for p, l in zip(prediction, label) if l >= 0]
-                   for prediction, label in zip(predictions, labels)]
+    def __call__(self, pred):
+        """
+        Compute metrics use "seqeval"
+        It evaluates based on Entity Level F1 score.
+        """
+        metric = load_metric('seqeval')
 
-    results = metric.compute(
-        predictions=true_predictions, references=true_labels)
-    print(results)
-    
-    eval_results = {
-        "precision": results["overall_precision"],
-        "recall": results["overall_recall"],
-        "f1": results["overall_f1"],
-        "accuracy": results["overall_accuracy"],
-    }
+        labels = pred.label_ids
+        predictions = pred.predictions.argmax(2)
 
-    return eval_results
+        # Discard special tokens based on true_labels.
+        true_predictions = [[self.index_to_label[p] for p, l in zip(
+            prediction, label) if l >= 0] for prediction, label in zip(predictions, labels)]
+        true_labels = [[self.index_to_label[p][l] for p, l in zip(prediction, label) if l >= 0]
+                    for prediction, label in zip(predictions, labels)]
+
+        results = metric.compute(
+            predictions=true_predictions, references=true_labels)
+        eval_results = {
+            "precision": results["overall_precision"],
+            "recall": results["overall_recall"],
+            "f1": results["overall_f1"],
+            "accuracy": results["overall_accuracy"],
+        }
+        print(classification_report(true_labels, true_predictions))
+
+        return eval_results
 
 
 def train_one_fold(data, n_fold, data_args, config):
@@ -177,7 +182,7 @@ def train_one_fold(data, n_fold, data_args, config):
                                   with_text=False),
         train_dataset=train_dataset,
         eval_dataset=valid_dataset,
-        compute_metrics=compute_metrics,
+        compute_metrics=compute_metrics(index_to_label),
     )
 
     trainer.train()
