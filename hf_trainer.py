@@ -117,7 +117,7 @@ class compute_metrics():
         # Discard special tokens based on true_labels.
         true_predictions = [[self.index_to_label[p] for p, l in zip(
             prediction, label) if l >= 0] for prediction, label in zip(predictions, labels)]
-        true_labels = [[self.index_to_label[p][l] for p, l in zip(prediction, label) if l >= 0]
+        true_labels = [[self.index_to_label[p] for p, l in zip(prediction, label) if l >= 0]
                     for prediction, label in zip(predictions, labels)]
 
         results = metric.compute(
