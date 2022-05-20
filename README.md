@@ -113,6 +113,3 @@ python inference_ensemble.py --model_folder ./model -- test_file ./test_klue_rob
 - Devlin et al., BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding, ACL, 2019
 - Kihyun Kim, Simple Neural Text Classification (NTC), GitHub
 - 황석현 외, BERT를 활용한 한국어 개체명 인식기, 한국정보처리학회, 2019
-
-## NER Demo
-데모 url
