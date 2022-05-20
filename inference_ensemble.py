@@ -138,4 +138,3 @@ def main(config):
 if __name__ == "__main__":
     config = define_argparser()
     main(config)
-
