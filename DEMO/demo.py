@@ -23,7 +23,7 @@ def load_model(model_name):
                                 map_location='cuda:0' if torch.cuda.is_available() else 'cpu'))
         else:
             model.append(torch.load(f"/home/user/ner_project/ner/models/{model_name_split[0]}_{model_name_split[1].split('-')[0]}.2_epochs.512_length.{i}_fold.pth",
-                                map_location='cuda:0' if torch.cuda.is_available() else 'cpu'))  # 모델이름 논의 필요
+                                map_location='cuda:0' if torch.cuda.is_available() else 'cpu')) 
     return model
 
 @st.cache(allow_output_mutation=True)
