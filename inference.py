@@ -8,8 +8,8 @@ import torch.nn as nn
 import torch.nn.functional as F 
 from torch.utils.data import DataLoader
 
-# skt kobert tokenizer/ model
-from kobert_tokenizer import KoBERTTokenizer 
+# kobert tokenizer/ model
+from kobert_tokenizer import KoBERTTokenizer
 from transformers import BertModel
 
 # Huggingface AutomModel/Tokenizer
@@ -73,7 +73,7 @@ def main(config):
     with torch.no_grad():
         # Declare model and load pre-trained weights.
         tokenizer_loader = AutoTokenizer if config.use_AutoTokenizer else KoBERTTokenizer
-        tokenizer = AutoTokenizer.from_pretrained(train_config.pretrained_model_name)
+        tokenizer = tokenizer_loader.from_pretrained(train_config.pretrained_model_name)
         model = AutoModelForTokenClassification.from_pretrained(train_config.pretrained_model_name,
                                                                 num_labels=len(index_to_label)
                                                                )
