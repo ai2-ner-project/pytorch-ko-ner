@@ -102,11 +102,11 @@ python inference_ensemble.py --model_folder ./model -- test_file ./test_klue_rob
 
 |PLMs|F1 Score|Accuracy|
 |-|-|-|
-|klue/bert-base|0.831|0.965|
-|klue/roberta-base|0.837|0.966|
-|skt/kobert-base-v1|0.771|0.954|
-|monologg/koelectra-base-v3-discriminator|0.830|0.965|
-|monologg/kobigbird-bert-base|0.809|0.961|
+|klue/bert-base|0.865|0.974|
+|klue/roberta-base|0.866|0.974|
+|skt/kobert-base-v1|0.846|0.965|
+|monologg/koelectra-base-v3-discriminator|0.858|0.972|
+|monologg/kobigbird-bert-base|0.827|0.965|
 
 
 ## Reference
