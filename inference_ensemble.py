@@ -26,6 +26,13 @@ from tqdm import tqdm
 from datasets import load_metric
 from seqeval.metrics import classification_report
 
+def str2bool(v):
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
 
 def define_argparser():
     """
@@ -34,7 +41,7 @@ def define_argparser():
     p = argparse.ArgumentParser()
     p.add_argument('--model_folder', required=True)
     p.add_argument('--test_file', required=True)
-    p.add_argument('--use_AutoTokenizer', type=bool, default=True)
+    p.add_argument('--use_AutoTokenizer', type=str2bool, default=True)
     p.add_argument('--gpu_id', type=int, default=-1) 
     p.add_argument('--batch_size', type=int, default=16)
 
