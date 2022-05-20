@@ -85,8 +85,8 @@ python hf_trainer.py --model_fn models --data_fn data/encoded/train.klue_roberta
 - Total train data : 303028
 - Train : validation = 8 : 2 (242422 : 60606)
 - Batch size, epochs : 32, 2 (BigBird의 경우 16, 1)
-- total iterations : 폴드별 15152번으로 동일하게 설정
 - n-Fold : 5
+- total iterations : 폴드별 15152번으로 동일하게 설정
 
 
 ### Inference
