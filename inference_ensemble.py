@@ -26,14 +26,6 @@ from tqdm import tqdm
 from datasets import load_metric
 from seqeval.metrics import classification_report
 
-def str2bool(v):
-    if v.lower() in ('yes', 'true', 't', 'y', '1'):
-        return True
-    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
-        return False
-    else:
-        raise argparse.ArgumentTypeError('Boolean value expected.')
-
 def define_argparser():
     """
     Define argument parser to take inference using pre-trained model.
@@ -41,7 +33,7 @@ def define_argparser():
     p = argparse.ArgumentParser()
     p.add_argument('--model_folder', required=True)
     p.add_argument('--test_file', required=True)
-    p.add_argument('--use_AutoTokenizer', type=str2bool, default=True)
+    p.add_argument('--use_KoBERTTokenizer', action='store_true') # default는 AutoTokenizer
     p.add_argument('--gpu_id', type=int, default=-1) 
     p.add_argument('--batch_size', type=int, default=16)
 
@@ -110,7 +102,7 @@ def main(config):
     index_to_label = saved_data_list[0]['classes']
     bert_best_list = [saved_data['bert'] for saved_data in saved_data_list]
 
-    tokenizer_loader = AutoTokenizer if config.use_AutoTokenizer else KoBERTTokenizer
+    tokenizer_loader = KoBERTTokenizer if config.use_KoBERTTokenizer else AutoTokenizer 
     tokenizer = tokenizer_loader.from_pretrained(train_config.pretrained_model_name)
     model = AutoModelForTokenClassification.from_pretrained(
                                                                 train_config.pretrained_model_name,
