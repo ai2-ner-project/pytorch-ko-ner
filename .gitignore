@@ -1,0 +1,7 @@
+*.ipynb
+
+result/*
+
+data/*
+
+.vscode

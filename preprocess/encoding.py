@@ -37,6 +37,47 @@ def define_argparser():
     return config
 
 
+def get_char_labels(length, ne, label_to_index):
+    char_labels = [0] * length
+    for i in range(1, len(ne)+1):
+        begin = ne[i]['begin']
+        end = ne[i]['end']
+        B_label = 'B-'+ne[i]['label'][:2]
+        I_label = 'I-'+ne[i]['label'][:2]
+        for j in range(begin, end):
+            char_labels[j] = label_to_index[I_label]
+        char_labels[begin] = label_to_index[B_label]
+
+    return char_labels
+
+
+def get_kobert_offset_mappings(kobert_tokens):
+    kobert_offset_mappings = []
+    offset_begin = -1
+    for i in kobert_tokens:
+        if i.startswith('▁'):
+            offset_begin += 1
+            i = i[1:]
+    offset_end = offset_begin+len(i)
+    kobert_offset_mappings.append((offset_begin, offset_end))
+    offset_begin = offset_end
+
+    return kobert_offset_mappings
+
+
+def get_token_labels(char_labels, offset_mappings=None):
+    token_labels = []
+
+    for offset_mapping in offset_mappings:
+        start_offset, end_offset = offset_mapping
+        if start_offset == end_offset:
+            token_labels.append(-100)
+            continue
+        token_labels.append(char_labels[start_offset])
+
+    return token_labels
+
+
 def BIO_tagging(text_tokens, ne, offset_map=None):
     labeled_sequence = [token if token in [
         '[CLS]', '[SEP]', '[PAD]'] else 'O' for token in text_tokens]
@@ -89,6 +130,7 @@ def get_label_dict(labels):
 
 
 def main(config):
+    USE_KOBERT = True if config.pretrained_model_name == 'skt/kobert-base-v1' else False
 
     data = pd.read_pickle(config.load_fn)
 
@@ -97,7 +139,7 @@ def main(config):
 
     pretrained_model_name = config.pretrained_model_name
 
-    if pretrained_model_name == 'skt/kobert-base-v1':
+    if USE_KOBERT:
         tokenizer_loader = KoBERTTokenizer
     else:
         tokenizer_loader = AutoTokenizer
@@ -113,7 +155,14 @@ def main(config):
     sep_token = tokenizer.sep_token
     max_length = 512
 
-    if tokenizer.name_or_path != 'skt/kobert-base-v1':
+    if USE_KOBERT:
+        encoded = tokenizer(texts,
+                            add_special_tokens=True,
+                            padding=False,
+                            return_attention_mask=True,
+                            truncation=True,
+                            max_length=max_length)
+    else:
         encoded = tokenizer(texts,
                             add_special_tokens=True,
                             padding=False,
@@ -121,35 +170,38 @@ def main(config):
                             truncation=True,
                             max_length=max_length,
                             return_offsets_mapping=True)
-    else:
-        encoded = tokenizer(texts,
-                            add_special_tokens=True,
-                            padding=False,
-                            return_attention_mask=True,
-                            truncation=True,
-                            max_length=max_length)
     print("Sentences encoded : |input_ids| %d, |attention_mask| %d" %
           (len(encoded['input_ids']), len((encoded['attention_mask']))))
 
     ne_ids = []
-    # (batch_size, length)
+    
+    if USE_KOBERT:
+        text_tokens = [[cls_token] + tokenizer.tokenize(text)[:max_length-2] + [sep_token] for text in texts]
+        offset_mappings = [get_kobert_offset_mappings(text_token) for text_token in text_tokens]
+    else: 
+        offset_mappings = encoded['offset_mapping']
 
-    if tokenizer.name_or_path == 'skt/kobert-base-v1':
-        for text, ne in zip(texts, nes):
-            text_tokens = [cls_token] + \
-                tokenizer.tokenize(text)[:max_length-2] + [sep_token]
-            ne_sequence = BIO_tagging(text_tokens=text_tokens, ne=ne)
-            ne_id = [label_to_index[key] if key in label_to_index.keys()
-                     else -100 for key in ne_sequence]
-            ne_ids.append(ne_id)
-    else:
-        for text, ne, offset_mapping in zip(texts, nes, encoded['offset_mapping']):
-            text_tokens = [cls_token] + \
-                tokenizer.tokenize(text)[:max_length-2] + [sep_token]
-            ne_sequence = BIO_tagging(text_tokens, ne, offset_mapping)
-            ne_id = [label_to_index[key] if key in label_to_index.keys()
-                     else -100 for key in ne_sequence]
-            ne_ids.append(ne_id)
+    for text, ne, offset_mapping in zip(texts, nes, offset_mappings):
+        char_labels = get_char_labels(len(text), ne, label_to_index)
+        token_labels = get_token_labels(char_labels, offset_mapping)
+        ne_ids.append(token_labels)
+
+    # if tokenizer.name_or_path == 'skt/kobert-base-v1':
+    #     for text, ne in zip(texts, nes):
+    #         text_tokens = [cls_token] + \
+    #             tokenizer.tokenize(text)[:max_length-2] + [sep_token]
+    #         ne_sequence = BIO_tagging(text_tokens=text_tokens, ne=ne)
+    #         ne_id = [label_to_index[key] if key in label_to_index.keys()
+    #                  else -100 for key in ne_sequence]
+    #         ne_ids.append(ne_id)
+    # else:
+    #     for text, ne, offset_mapping in zip(texts, nes, encoded['offset_mapping']):
+    #         text_tokens = [cls_token] + \
+    #             tokenizer.tokenize(text)[:max_length-2] + [sep_token]
+    #         ne_sequence = BIO_tagging(text_tokens, ne, offset_mapping)
+    #         ne_id = [label_to_index[key] if key in label_to_index.keys()
+    #                  else -100 for key in ne_sequence]
+    #         ne_ids.append(ne_id)
 
     print("Sequence labeling completed : |labels| %d" % (len(ne_ids)))
 
