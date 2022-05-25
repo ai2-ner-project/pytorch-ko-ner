@@ -220,6 +220,7 @@ def main(config):
         "data": return_data.to_dict(),
         "label_info": label_info,
         "pad_token": (tokenizer.pad_token, tokenizer.pad_token_id),
+        "pretrained_model_name": tokenizer.name_or_path
     }
 
     save_path = config.save_path   
@@ -228,7 +229,7 @@ def main(config):
     save_fn = os.path.join(save_path, f'{fn}.{plm_name}.encoded.pickle')
 
     with open(save_fn, "wb") as f:
-        pickle.dump(return_values, f, pickle.HIGHEST_PROTOCOL)
+        pickle.dump(return_values, f, 4)
     print("Encoded data saved as %s " % save_fn)
 
 if __name__ == "__main__":

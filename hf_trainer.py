@@ -29,12 +29,7 @@ def define_argparser():
                    help="Directory to save trained model.")
     p.add_argument('--data_fn',
                    required=True,
-                   help="Data file name for training model.")
-
-    p.add_argument('--pretrained_model_name',
-                   required=True,
-                   default='klue/bert-base',
-                   help="Pretrained model name from HuggingFace.")
+                   help="Data file name encoded by encoding.py to train the model.")
 
     p.add_argument('--valid_ratio', type=float, default=.2)
     p.add_argument('--batch_size_per_device', type=int, default=32)
@@ -134,7 +129,7 @@ class compute_metrics():
 
 
 def train_one_fold(data, n_fold, data_args, config):
-    pretrained_model_name = config.pretrained_model_name.replace('/', '_')
+    pretrained_model_name = data_args['pretrained_model_name'].replace('/', '_')
 
     label_to_index = data_args['label_info']['label_to_index']
     index_to_label = data_args['label_info']['index_to_label']
@@ -149,7 +144,7 @@ def train_one_fold(data, n_fold, data_args, config):
 
     # Get pretrained model and tokenizer.
     model = get_pretrained_model(
-        config.pretrained_model_name, len(label_to_index))
+        data_args['pretrained_model_name'], len(label_to_index))
 
     total_batch_size = config.batch_size_per_device * torch.cuda.device_count()
     n_total_iterations = int(len(train_dataset) /
