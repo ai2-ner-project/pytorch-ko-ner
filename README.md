@@ -39,7 +39,7 @@ python ./preprocess/json_to_tsv.py --load_path data/json/21_150tags_NamedEntity 
 2. 학습과 평가 데이터셋을 만들어 train.pickle, test.pickle로 저장합니다.
 데이터를 합치고 필요 없는 열, 문장이 누락된 행을 제거하는 과정이 포함됩니다.
 ```bash
-python ./preprocess/preprocess.py --load_path data/raw --load_path data/dataset --test_size 0.15 --test_o_size 0.2 --save_all --return_tsv
+python ./preprocess/preprocess.py --load_path data/raw --save_path data/dataset --test_size 0.15 --test_o_size 0.2 --save_all --return_tsv
 ```
 ```
 4 files found :  ['SXNE21.pickle', 'SXNE2102007240.pickle', 'NXNE2102008030.pickle', 'NXNE2102203310.pickle']
